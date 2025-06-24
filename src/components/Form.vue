@@ -53,12 +53,39 @@
           ></textarea>
         </div>
 
+        <div
+          class="w-full px-4 py-3 bg-white/10 border border-emerald-400/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+        >
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input
+              type="checkbox"
+              required
+              class="w-5 h-5 accent-emerald-400 border border-emerald-400 rounded transition duration-200"
+            />
+            <span class="text-sm">
+              Acepto los
+              <a
+                href="#"
+                @click ="showModal = true"
+                class="underline text-emerald-300 hover:text-emerald-400 transition"
+              >
+                Términos y Condiciones
+              </a>
+            </span>
+          </label>
+        </div>
+
         <button
           type="submit"
           class="w-full mt-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-emerald-500 hover:to-emerald-700 transition-all shadow-lg hover:shadow-emerald-500/20"
         >
           Enviar mensaje
-          <svg class="w-4 h-4 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-4 h-4 inline ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -70,10 +97,31 @@
       </form>
     </div>
   </div>
+
+  <div
+    v-if="showModal"
+    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    @click.self="showModal = false"
+  >
+    <div class="bg-white rounded-lg max-w-md w-full p-6 text-black">
+      <h2 class="text-xl font-bold mb-4">Términos y Condiciones</h2>
+      <p class="text-sm mb-4">
+        Al aceptar, usted reconoce haber leído y comprendido las
+        reglas de uso del servicio. Este texto es un ejemplo; asegúrate de reemplazarlo por tus propios términos
+        legales.
+      </p>
+      <button
+        @click="showModal = false"
+        class="mt-2 px-4 py-2 bg-emerald-400 text-white rounded hover:bg-emerald-500 transition"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useContactStore } from '@/stores/contactStore'
 
 const contactStore = useContactStore()
@@ -85,12 +133,13 @@ const form = reactive({
   message: '',
 })
 
+const showModal = ref(false)
+
 const handleSubmit = async () => {
   await contactStore.addContact(form)
 
   if (!contactStore.error) {
     alert('Mensaje enviado con éxito.')
-    // Limpiar campos
     form.name = ''
     form.email = ''
     form.phone = ''
