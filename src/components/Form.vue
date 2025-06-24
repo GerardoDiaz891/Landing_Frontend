@@ -53,6 +53,9 @@
           ></textarea>
         </div>
 
+        <!--Recaptcha-->
+        <div class="g-recaptcha" data-sitekey="6LcUZmsrAAAAAED4P8m9xlzAJ7Z7G-TRlqy16rc4"></div>
+
         <button
           type="submit"
           class="w-full mt-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-emerald-500 hover:to-emerald-700 transition-all shadow-lg hover:shadow-emerald-500/20"
@@ -86,7 +89,19 @@ const form = reactive({
 })
 
 const handleSubmit = async () => {
-  await contactStore.addContact(form)
+  // Obtener token generado por reCAPTCHA
+  const recaptchaToken = (window as any).grecaptcha.getResponse()
+
+  if (!recaptchaToken) {
+    alert('Por favor verifica que no eres un robot.')
+    return
+  }
+
+  // Enviar el token junto con el formulario
+  await contactStore.addContact({
+    ...form,
+    token: recaptchaToken,
+  })
 
   if (!contactStore.error) {
     alert('Mensaje enviado con éxito.')
@@ -95,6 +110,8 @@ const handleSubmit = async () => {
     form.email = ''
     form.phone = ''
     form.message = ''
+    // Limpiar reCAPTCHA (para que se pueda enviar otra vez)
+    grecaptcha.reset()
   } else {
     alert(contactStore.error)
   }
