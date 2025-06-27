@@ -66,7 +66,7 @@
               Acepto los
               <a
                 href="#"
-                @click ="showModal = true"
+                @click="showModal = true"
                 class="underline text-emerald-300 hover:text-emerald-400 transition"
               >
                 Términos y Condiciones
@@ -106,9 +106,7 @@
     <div class="bg-white rounded-lg max-w-md w-full p-6 text-black">
       <h2 class="text-xl font-bold mb-4">Términos y Condiciones</h2>
       <p class="text-sm mb-4">
-        Al aceptar, usted reconoce haber leído y comprendido las
-        reglas de uso del servicio. Este texto es un ejemplo; asegúrate de reemplazarlo por tus propios términos
-        legales.
+        Al aceptar, usted reconoce haber leído y comprendido las reglas de uso del servicio. Este texto es un ejemplo; asegúrate de reemplazarlo por tus propios términos legales.
       </p>
       <button
         @click="showModal = false"
@@ -135,8 +133,44 @@ const form = reactive({
 
 const showModal = ref(false)
 
+//sanitización
+const sanitizeInput = (input: string): string => {
+  return input
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim()
+}
+
+//validaciones
+const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+const isValidPhone = (phone: string): boolean => {
+  return /^\+?\d{7,15}$/.test(phone)
+}
+
 const handleSubmit = async () => {
-  await contactStore.addContact(form)
+  const sanitizedForm = {
+    name: sanitizeInput(form.name),
+    email: sanitizeInput(form.email),
+    phone: sanitizeInput(form.phone),
+    message: sanitizeInput(form.message),
+  }
+
+  if (!isValidEmail(sanitizedForm.email)) {
+    alert('Correo electrónico no válido.')
+    return
+  }
+
+  if (!isValidPhone(sanitizedForm.phone)) {
+    alert('Número de teléfono no válido.')
+    return
+  }
+
+  await contactStore.addContact(sanitizedForm)
 
   if (!contactStore.error) {
     alert('Mensaje enviado con éxito.')
