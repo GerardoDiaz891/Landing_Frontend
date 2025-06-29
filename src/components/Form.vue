@@ -16,8 +16,8 @@
             type="text"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent transition"
             placeholder="Tu nombre"
-            required
           />
+          <p v-if="errors.name" class="text-amber-300 text-sm mt-2">{{ errors.name }}</p>
         </div>
 
         <div>
@@ -27,8 +27,8 @@
             type="email"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent transition"
             placeholder="tu@email.com"
-            required
           />
+          <p v-if="errors.email" class="text-amber-300 text-sm mt-2">{{ errors.email }}</p>
         </div>
 
         <div>
@@ -38,8 +38,10 @@
             type="tel"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent transition"
             placeholder="+1234567890"
-            required
           />
+          <p v-if="errors.phone" class="text-amber-300 text-sm mt-2">
+            {{ errors.phone }}
+          </p>
         </div>
 
         <div>
@@ -49,8 +51,8 @@
             rows="3"
             class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-transparent transition"
             placeholder="Cuéntanos sobre tu viaje ideal"
-            required
           ></textarea>
+          <p v-if="errors.message" class="text-amber-300 text-sm mt-2">{{ errors.message }}</p>
         </div>
 
         <div
@@ -120,6 +122,31 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useContactStore } from '@/stores/contactStore'
+import * as yup from 'yup'
+
+// Validaciones y sanitización
+const contactSchema = yup.object({
+  name: yup
+    .string()
+    .required('El nombre es obligatorio')
+    .transform((val: string) => val.trim())
+    .min(3, 'Mínimo 3 caracteres'),
+  email: yup
+    .string()
+    .required('El correo es obligatorio')
+    .email('Correo inválido')
+    .transform((val: string) => val.trim().toLowerCase()),
+  phone: yup
+    .string()
+    .required('El teléfono es obligatorio')
+    .transform((val: string) => val.replace(/\D/g, ''))
+    .matches(/^[0-9]{7,15}$/, 'El teléfono debe tener entre 7 y 15 dígitos'),
+  message: yup
+    .string()
+    .required('El mensaje es obligatorio')
+    .transform((val: string) => val.trim())
+    .min(10, 'Mínimo 10 caracteres'),
+})
 
 const contactStore = useContactStore()
 
@@ -130,33 +157,44 @@ const form = reactive({
   message: '',
 })
 
+const errors = reactive({
+  name: '',
+  email: '',
+  phone: '',
+  message: '',
+})
+
 const showModal = ref(false)
 
 const handleSubmit = async () => {
-  // Obtener token generado por reCAPTCHA
-  const recaptchaToken = (window as any).grecaptcha.getResponse()
+  try {
+    // Validar con Yup
+    await contactSchema.validate(form, { abortEarly: false })
+    Object.keys(errors).forEach((key) => (errors[key as keyof typeof errors] = '')) // Limpiar errores
 
-  if (!recaptchaToken) {
-    alert('Por favor verifica que no eres un robot.')
-    return
-  }
+    // Validar reCAPTCHA
+    const recaptchaToken = (window as any).grecaptcha.getResponse()
+    if (!recaptchaToken) {
+      alert('Por favor verifica que no eres un robot.')
+      return
+    }
 
-  // Enviar el token junto con el formulario
-  await contactStore.addContact({
-    ...form,
-    token: recaptchaToken,
-  })
+    // Enviar
+    await contactStore.addContact({ ...form, token: recaptchaToken })
 
-  if (!contactStore.error) {
-    alert('Mensaje enviado con éxito.')
-    form.name = ''
-    form.email = ''
-    form.phone = ''
-    form.message = ''
-    // Limpiar reCAPTCHA (para que se pueda enviar otra vez)
-    grecaptcha.reset()
-  } else {
-    alert(contactStore.error)
+    if (!contactStore.error) {
+      alert('Mensaje enviado con éxito.')
+      Object.assign(form, { name: '', email: '', phone: '', message: '' })
+      grecaptcha.reset()
+    } else {
+      alert(contactStore.error)
+    }
+  } catch (err: any) {
+    if (err.name === 'ValidationError') {
+      err.inner.forEach((e: any) => {
+        errors[e.path as keyof typeof errors] = e.message
+      })
+    }
   }
 }
 </script>
