@@ -106,8 +106,7 @@
     <div class="bg-white rounded-lg max-w-md w-full p-6 text-black">
       <h2 class="text-xl font-bold mb-4">Términos y Condiciones</h2>
       <p class="text-sm mb-4">
-        Al aceptar, usted reconoce haber leído y comprendido las reglas de uso del servicio. Este
-        texto es un ejemplo; asegúrate de reemplazarlo por tus propios términos legales.
+        Al aceptar, usted reconoce haber leído y comprendido las reglas de uso del servicio.
       </p>
       <button
         @click="showModal = false"
