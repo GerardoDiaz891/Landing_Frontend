@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <RouterView />
+  <div class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <RouterView />
+  </div>
 </template>
+

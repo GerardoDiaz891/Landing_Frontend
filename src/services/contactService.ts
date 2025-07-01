@@ -9,3 +9,14 @@ export const createContact = async (data: any) => {
   const response = genericRequest('/contacts', 'POST', data)
   return response
 }
+
+export const updateContact = async (id: number, data: any) => {
+  const response = genericRequest(`/contacts/${id}`, 'PUT', data)
+  return response
+}
+
+export const deleteContact = async (id: number) => {
+  const response = genericRequest(`/contacts/${id}`, 'DELETE')
+  return response
+}
+
