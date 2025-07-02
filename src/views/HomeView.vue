@@ -6,10 +6,13 @@
     <!-- Capa de overlay con gradiente para mejor contraste y estética -->
     <div class="absolute inset-0 bg-gradient-to-br from-blue-900/70 to-emerald-900/60"></div>
 
+    <!-- Barra de navegación superior -->
+    <Navbar />
+
     <div
       class="relative z-10 max-w-7xl w-full px-6 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
     >
-      <!-- Texto principal mejorado -->
+      <!-- Texto principal -->
       <div class="text-white space-y-8">
         <div>
           <span
@@ -64,11 +67,12 @@
       </div>
 
       <!-- Formulario -->
-      <Form></Form>
+      <Form />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import Form from '@/components/Form.vue'
+import Navbar from '@/components/Navbar.vue'
 </script>
