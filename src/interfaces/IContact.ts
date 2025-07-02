@@ -5,4 +5,5 @@ export interface IContact {
   phone: string
   message: string
   created_at?: string
+  token?: string
 }

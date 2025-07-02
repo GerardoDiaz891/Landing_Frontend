@@ -165,6 +165,8 @@ const errors = reactive({
 
 const showModal = ref(false)
 
+declare const grecaptcha: any
+
 const handleSubmit = async () => {
   try {
     // Validar con Yup
