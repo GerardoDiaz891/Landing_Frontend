@@ -48,14 +48,24 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const form = reactive({
   email: '',
   password: '',
 })
 
-const handleLogin = () => {
-  console.log('Iniciar sesión con:', form)
-  // Aquí podrías hacer la petición al backend
+const handleLogin = async () => {
+  try {
+    await authStore.login(form)
+    // Redirige al dashboard
+    router.push('/dashboard')
+  } catch (error) {
+    alert('Credenciales incorrectas o error en el servidor')
+  }
 }
 </script>
