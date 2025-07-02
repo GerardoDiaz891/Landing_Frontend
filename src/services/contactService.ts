@@ -1,7 +1,7 @@
-import { genericRequest } from '@/utils/genericRequest'
+import { genericRequest, genericRequestAuth } from '@/utils/genericRequest'
 
 export const getContacts = async () => {
-  const response = genericRequest('/contacts', 'GET')
+  const response = genericRequestAuth('/contacts', 'GET')
   return response
 }
 
@@ -11,12 +11,11 @@ export const createContact = async (data: any) => {
 }
 
 export const updateContact = async (id: number, data: any) => {
-  const response = genericRequest(`/contacts/${id}`, 'PUT', data)
+  const response = genericRequestAuth(`/contacts/${id}`, 'PUT', data)
   return response
 }
 
 export const deleteContact = async (id: number) => {
-  const response = genericRequest(`/contacts/${id}`, 'DELETE')
+  const response = genericRequestAuth(`/contacts/${id}`, 'DELETE')
   return response
 }
-
