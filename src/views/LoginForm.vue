@@ -18,10 +18,10 @@
           <input
             v-model="form.email"
             type="email"
-            required
             placeholder="correo@ejemplo.com"
             class="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300"
           />
+          <p v-if="errors.email" class="text-amber-300 text-sm mt-2">{{ errors.email }}</p>
         </div>
 
         <div>
@@ -29,10 +29,10 @@
           <input
             v-model="form.password"
             type="password"
-            required
             placeholder="••••••••"
             class="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-emerald-300"
           />
+          <p v-if="errors.password" class="text-amber-300 text-sm mt-2">{{ errors.password }}</p>
         </div>
 
         <button
@@ -50,18 +50,48 @@
 import { reactive } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
+import * as yup from 'yup'
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+// Validaciones y sanitización
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .required('El correo es obligatorio')
+    .email('Correo inválido')
+    .transform((val: string) => val.trim().toLowerCase()),
+
+  password: yup
+    .string()
+    .required('La contraseña es obligatoria')
+    .transform((val: string) => val.trim())
+    .min(6, 'Mínimo 6 caracteres'),
+})
 
 const form = reactive({
   email: '',
   password: '',
 })
 
+const errors = reactive({
+  email: '',
+  password: '',
+})
+
 const handleLogin = async () => {
   try {
-    await authStore.login(form)
+    // Validar y sanitizar
+    const validatedData = await loginSchema.validate(form, {
+      abortEarly: false, // para obtener todos los errores
+    })
+
+    // Si todo está bien, limpiar errores anteriores
+    errors.email = ''
+    errors.password = ''
+
+    await authStore.login(validatedData)
 
     // Redirige según el rol
     if (authStore.user?.role === 'admin') {
@@ -69,8 +99,15 @@ const handleLogin = async () => {
     } else {
       router.push('/')
     }
-  } catch (error) {
-    alert('Credenciales incorrectas o error en el servidor')
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      // Captura y asigna los errores a cada campo
+      error.inner.forEach((e: any) => {
+        errors[e.path as 'email' | 'password'] = e.message
+      })
+    } else {
+      alert('Credenciales incorrectas o error en el servidor')
+    }
   }
 }
 </script>
