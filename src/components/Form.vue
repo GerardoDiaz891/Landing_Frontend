@@ -78,7 +78,7 @@
         </div>
 
         <!--Recaptcha-->
-        <div class="g-recaptcha" data-sitekey="6LcUZmsrAAAAAED4P8m9xlzAJ7Z7G-TRlqy16rc4"></div>
+        <div class="g-recaptcha" :data-sitekey="siteKey"></div>
 
         <button
           type="submit"
@@ -122,6 +122,8 @@
 import { reactive, ref } from 'vue'
 import { useContactStore } from '@/stores/contactStore'
 import * as yup from 'yup'
+
+const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 
 // Validaciones y sanitización
 const contactSchema = yup.object({
