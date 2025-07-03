@@ -1,12 +1,13 @@
 // stores/authStore.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { IAuthResponse, ILoginUser } from '@/interfaces/IUser'
+import { ref, computed } from 'vue'
+import type { ILoginUser, IUser } from '@/interfaces/IUser'
 import { loginUser } from '@/services/authService'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null)
-  const user = ref<IAuthResponse | null>(null)
+  const user = ref<IUser | null>(null)
+  const isAuth = computed(() => !!token.value)
 
   const login = async (credentials: ILoginUser) => {
     try {
@@ -33,6 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     token,
     user,
+    isAuth,
     login,
     logout,
   }

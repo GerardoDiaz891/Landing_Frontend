@@ -62,8 +62,13 @@ const form = reactive({
 const handleLogin = async () => {
   try {
     await authStore.login(form)
-    // Redirige al dashboard
-    router.push('/dashboard')
+
+    // Redirige según el rol
+    if (authStore.user?.role === 'admin') {
+      router.push('/dashboard')
+    } else {
+      router.push('/')
+    }
   } catch (error) {
     alert('Credenciales incorrectas o error en el servidor')
   }
