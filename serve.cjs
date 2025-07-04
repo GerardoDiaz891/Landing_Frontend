@@ -1,7 +1,7 @@
 // serve.cjs
 const { exec } = require("child_process");
 
-const port = process.env.PORT || 4173;
+const port = process.env.PORT;
 
 if (!port) {
   console.error("❌ ERROR: process.env.PORT no está definido");
