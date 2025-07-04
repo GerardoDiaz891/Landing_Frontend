@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview --host",
-    "start": "serve dist",
+    "start": "serve -l $PORT dist",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "format": "prettier --write src/"
