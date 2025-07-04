@@ -10,7 +10,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "format": "prettier --write src/",
-    "start": "cross-env serve -s dist -l $PORT"
+    "start": "node serve.cjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
