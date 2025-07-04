@@ -101,12 +101,17 @@ const handleLogin = async () => {
     }
   } catch (error: any) {
     if (error.name === 'ValidationError') {
-      // Captura y asigna los errores a cada campo
       error.inner.forEach((e: any) => {
         errors[e.path as 'email' | 'password'] = e.message
       })
+    } else if (error.response && error.response.status === 401) {
+      // 💥 Aquí se captura el error del backend por credenciales inválidas
+      const mensaje = error.response.data?.error || 'Credenciales incorrectas'
+      errors.email = mensaje
+      errors.password = mensaje
     } else {
-      alert('Credenciales incorrectas o error en el servidor')
+      // ⚠️ Errores inesperados (servidor caído, sin conexión, etc.)
+      alert('Error inesperado en el servidor. Intenta más tarde.')
     }
   }
 }
